@@ -20,7 +20,8 @@ public class Main {
       int count = 0;
       while (true) {
         Socket clientSocket = serverSocket.accept();
-        String[] strArray = set(clientSocket); 
+        String[] strArray = {"", ""}
+        strArray = set(clientSocket); 
         setterArr[count] = new setterGetter(strArray[0], strArray[1]);
         get(clientSocket, setterArr);
         new Thread(() -> {
@@ -69,6 +70,7 @@ public class Main {
        if ("SET".equalsIgnoreCase(content)) {
           reader.readLine();
           setter = reader.readLine();
+          reader.readLine();
           str = reader.readLine();
           writer.write("+OK\r\n");
           writer.flush();
@@ -79,7 +81,7 @@ public class Main {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-    return new String[]{""};
+    return new String[]{"", ""};
   }
   private static void process(Socket clientSocket) {
     try(BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
