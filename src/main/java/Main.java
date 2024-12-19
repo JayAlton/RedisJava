@@ -41,7 +41,7 @@ public class Main {
           writer.write("+PONG\r\n");
           writer.flush();
         } else if("ECHO".equalsIgnoreCase(content)) {
-          writer.write("+hey\r\n");
+          writer.write("+" + reader + "\r\n");
           writer.flush();
         } else if ("eof".equalsIgnoreCase(content)) {
           System.out.println("eof");
