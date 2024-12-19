@@ -10,8 +10,8 @@ import java.util.concurrent.TimeUnit;
 public class Main {
    private static final ConcurrentHashMap<String, String> dataStore = new ConcurrentHashMap<>();
    private static final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-   private static String dir = null;
-   private static String fileName = null;
+   private static String dir = "/tmp/redis-files";
+   private static String fileName = "dump.rdb";
 
   public static void main(String[] args){
     // You can use print statements as follows for debugging, they'll be visible when running tests.
@@ -124,10 +124,10 @@ public class Main {
                 String ans = "*2\r\n";
                 if(args[2].equalsIgnoreCase("dir")) {
                   ans += "$3\r\ndir\r\n";
-                  ans += "$" + 0 + "\r\n" + dir + "\r\n";
+                  ans += "$" + dir.length() + "\r\n" + dir + "\r\n";
                 } else if (args[2].equalsIgnoreCase("dbfilename")) {
                   ans += "$10\r\ndbfilename\r\n";
-                  ans += "$" + 0 + "\r\n" + fileName + "\r\n";
+                  ans += "$" + fileName.length() + "\r\n" + fileName + "\r\n";
                 }
                 writer.write(ans);
               }
