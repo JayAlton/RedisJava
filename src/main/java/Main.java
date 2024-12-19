@@ -1,8 +1,8 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -10,6 +10,9 @@ import java.util.concurrent.TimeUnit;
 public class Main {
    private static final ConcurrentHashMap<String, String> dataStore = new ConcurrentHashMap<>();
    private static final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+   private static String dir = null;
+   private static String fileName = null;
+
   public static void main(String[] args){
     // You can use print statements as follows for debugging, they'll be visible when running tests.
     System.out.println("Logs from your program will appear here!");
@@ -116,6 +119,18 @@ public class Main {
               }
               break;
 
+          case "CONFIG":
+              if(args[1].equalsIgnoreCase("GET")) {
+                String ans = "*2\r\n";
+                if(args[2].equalsIgnoreCase("dir")) {
+                  ans += "dir";
+                  ans += dir;
+                } else if (args[2].equalsIgnoreCase("dbfilename")) {
+                  ans += "dbfilename";
+                  ans += fileName;
+                }
+                writer.write(ans);
+              }
           default:
               writer.write("-ERR Unknown command\r\n");
       }
