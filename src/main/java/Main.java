@@ -68,6 +68,20 @@ public class Main {
 
       String command = args[0].toUpperCase();
       switch (command) {
+          case "ECHO" :
+            if(args.length != 2) {
+              writer.write("-ERR Wrong number of arguments for ECHO\r\n");
+            } else {
+              writer.write("$3\r\n" + args[1] + "\r\n");
+            }
+            break;
+          case "PING":
+            if(args.length != 1) {
+              writer.write("-ERR Wrong number of arguments for PING");
+            } else {
+              writer.write("+PONG\r\n");
+            }
+            break;
           case "SET":
               if (args.length != 3) {
                   writer.write("-ERR Wrong number of arguments for SET\r\n");
