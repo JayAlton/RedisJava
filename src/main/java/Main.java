@@ -71,6 +71,7 @@ public class Main {
           str = reader.readLine();
           writer.write("+OK\r\n");
           writer.flush();
+          System.out.println("Setter + getter: " + setter + " + " + str);
           return new String[]{setter, str};
         }
       }
