@@ -124,10 +124,10 @@ public class Main {
                 String ans = "*2\r\n";
                 if(args[2].equalsIgnoreCase("dir")) {
                   ans += "$3\r\ndir\r\n";
-                  ans += "$" + dir.length() + "\r\n" + dir + "\r\n";
+                  ans += "$" + 0 + "\r\n" + dir + "\r\n";
                 } else if (args[2].equalsIgnoreCase("dbfilename")) {
                   ans += "$10\r\ndbfilename\r\n";
-                  ans += "$" + fileName.length() + "\r\n" + fileName + "\r\n";
+                  ans += "$" + 0 + "\r\n" + fileName + "\r\n";
                 }
                 writer.write(ans);
               }
