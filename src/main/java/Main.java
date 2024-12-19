@@ -8,7 +8,6 @@ public class Main {
     System.out.println("Logs from your program will appear here!");
     // Uncomment this block to pass the first stage 
     ServerSocket serverSocket = null;
-    Socket clientSocket = null;
     int port = 6379;
     try {
       serverSocket = new ServerSocket(port);
@@ -16,27 +15,19 @@ public class Main {
       // ensures that we don't run into 'Address already in use' errors
       serverSocket.setReuseAddress(true);
       // Wait for connections from clients.
-      while (clientSocket.isConnected()) {
-        clientSocket = serverSocket.accept();
+      while (true) {
+        Socket clientSocket = serverSocket.accept();
         new Thread(() -> {
           try {
             pingPong(clientSocket);
           } catch(Exception e) {
             System.out.println("Exception: " + e.getMessage());
           }
-        }
+        }).start();
       }
       
     } catch (IOException e) {
       System.out.println("IOException: " + e.getMessage());
-    } finally {
-      try {
-        if (clientSocket != null) {
-          clientSocket.close();
-        }
-      } catch (IOException e) {
-        System.out.println("IOException: " + e.getMessage());
-      }
     }
   }
 
