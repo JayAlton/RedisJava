@@ -23,8 +23,7 @@ public class Main {
         new Thread(() -> {
           try {
             process(clientSocket);
-            String[] strArray = {};
-            strArray = set(clientSocket); 
+            String[] strArray = set(clientSocket); 
             setterGetter strObj = new setterGetter(strArray[0], strArray[1]);
             get(clientSocket, strObj);
           } catch(Exception e) {
