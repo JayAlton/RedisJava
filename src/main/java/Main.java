@@ -40,6 +40,12 @@ public class Main {
         if("ping".equalsIgnoreCase(content)) {
           writer.write("+PONG\r\n");
           writer.flush();
+        } else if ("SET".equalsIgnoreCase(content)) {
+          writer.write("+0K\r\n");
+          writer.flush();
+        } else if ("GET".equalsIgnoreCase(content)) {
+          writer.write("$3\r\nbar\r\n");
+          writer.flush();
         } else if("ECHO".equalsIgnoreCase(content)) {
           for(int i = 0; i < 2; i++) {
             content = reader.readLine();
