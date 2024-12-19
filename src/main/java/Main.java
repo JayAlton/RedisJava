@@ -72,7 +72,7 @@ public class Main {
             if(args.length != 2) {
               writer.write("-ERR Wrong number of arguments for ECHO\r\n");
             } else {
-              writer.write("$3\r\n" + args[1] + "\r\n");
+              writer.write(args[1]);
             }
             break;
           case "PING":
