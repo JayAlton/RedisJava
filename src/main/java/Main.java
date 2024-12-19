@@ -38,7 +38,7 @@ public class Main {
         while ((line = reader.readLine()) != null) {
             System.out.println("::" + line);
             if(expiryTime != 0) {
-              expiryTime-=100;
+              expiryTime--;
             }
             if (line.startsWith("*")) {
                 // Multi-bulk request (e.g., SET key value)
