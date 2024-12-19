@@ -16,14 +16,14 @@ public class Main {
       // ensures that we don't run into 'Address already in use' errors
       serverSocket.setReuseAddress(true);
       // Wait for connections from clients.
-      setterGetter[] setterArr = new setterGetter[]{};
-      int count = 0;
+     // setterGetter[] setterArr = new setterGetter[]{};
+      //int count = 0;
       while (true) {
         Socket clientSocket = serverSocket.accept();
         new Thread(() -> {
           try {
             process(clientSocket);
-            String[] strArray = {"", ""};
+            String[] strArray = {};
             strArray = set(clientSocket); 
             setterGetter strObj = new setterGetter(strArray[0], strArray[1]);
             get(clientSocket, strObj);
@@ -31,7 +31,7 @@ public class Main {
             System.out.println("Exception: " + e.getMessage());
           }
         }).start();
-        count++;
+        //count++;
       }
       
     } catch (IOException e) {
