@@ -20,6 +20,7 @@ public class Main {
         new Thread(() -> {
           try {
             pingPong(clientSocket);
+            echoHey(clientSocket);
           } catch(Exception e) {
             System.out.println("Exception: " + e.getMessage());
           }
@@ -31,6 +32,23 @@ public class Main {
     }
   }
 
+  private static void echoHey(Socket clientSocket) {
+    try(BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));) {
+      String content;
+      while((content = reader.readLine()) != null) {
+        System.out.println("::" + content);
+        if("echo".equalsIgnoreCase(content)) {
+          writer.write("+hey\r\n");
+          writer.flush();
+        } else if ("eof".equalsIgnoreCase(content)) {
+          System.out.println("eof");
+        }
+      }
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
   private static void pingPong(Socket clientSocket) {
     try(BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));) {
