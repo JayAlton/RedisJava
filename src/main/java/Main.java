@@ -9,6 +9,7 @@ public class Main {
     // Uncomment this block to pass the first stage 
     ServerSocket serverSocket = null;
     int port = 6379;
+    String globalString = "";
     try {
       serverSocket = new ServerSocket(port);
       // Since the tester restarts your program quite often, setting SO_REUSEADDR
@@ -17,6 +18,8 @@ public class Main {
       // Wait for connections from clients.
       while (true) {
         Socket clientSocket = serverSocket.accept();
+        globalString = set(clientSocket);
+        get(clientSocket, globalString);
         new Thread(() -> {
           try {
             process(clientSocket);
@@ -31,6 +34,39 @@ public class Main {
     }
   }
 
+  private static void get(Socket clientSocket, String globalString) {
+    try(BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));) {
+      String content;
+      while((content = reader.readLine()) != null) {
+        System.out.println("::" + content);
+       if ("GET".equalsIgnoreCase(content)) {
+          writer.write("$3\r\n" + globalString + "\r\n");
+          writer.flush();  
+        }
+      }
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+  private static String set(Socket clientSocket) {
+    try(BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));) {
+      String content;
+      while((content = reader.readLine()) != null) {
+        System.out.println("::" + content);
+       if ("SET".equalsIgnoreCase(content)) {
+          writer.write("+OK\r\n");
+          writer.flush();
+          reader.readLine();
+          return reader.readLine();
+        }
+      }
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+    return "";
+  }
   private static void process(Socket clientSocket) {
     try(BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));) {
@@ -39,12 +75,6 @@ public class Main {
         System.out.println("::" + content);
         if("ping".equalsIgnoreCase(content)) {
           writer.write("+PONG\r\n");
-          writer.flush();
-        } else if ("SET".equalsIgnoreCase(content)) {
-          writer.write("+OK\r\n");
-          writer.flush();
-        } else if ("GET".equalsIgnoreCase(content)) {
-          writer.write("$3\r\nbar\r\n");
           writer.flush();
         } else if("ECHO".equalsIgnoreCase(content)) {
           for(int i = 0; i < 2; i++) {
