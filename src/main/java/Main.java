@@ -123,11 +123,11 @@ public class Main {
               if(args[1].equalsIgnoreCase("GET")) {
                 String ans = "*2\r\n";
                 if(args[2].equalsIgnoreCase("dir")) {
-                  ans += "dir";
-                  ans += dir;
+                  ans += "$3\r\ndir\r\n";
+                  ans += "$" + dir.length() + "\r\n" + dir + "\r\n";
                 } else if (args[2].equalsIgnoreCase("dbfilename")) {
-                  ans += "dbfilename";
-                  ans += fileName;
+                  ans += "$10\r\ndbfilename\r\n";
+                  ans += "$" + fileName.length() + "\r\n" + fileName + "\r\n";
                 }
                 writer.write(ans);
               }
