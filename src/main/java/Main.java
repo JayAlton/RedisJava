@@ -41,8 +41,9 @@ public class Main {
           writer.write("+PONG\r\n");
           writer.flush();
         } else if("ECHO".equalsIgnoreCase(content)) {
-          reader.readLine();
-          content = reader.readLine();
+          for(int i = 0; i < 2; i++) {
+            content = reader.readLine();
+          }
           writer.write("+" + content + "\r\n");
           writer.flush();
         } else if ("eof".equalsIgnoreCase(content)) {
