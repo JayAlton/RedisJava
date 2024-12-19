@@ -20,14 +20,13 @@ public class Main {
       int count = 0;
       while (true) {
         Socket clientSocket = serverSocket.accept();
-        String[] strArray = {"", ""};
-        System.out.println(set(clientSocket));
-        strArray = set(clientSocket); 
-        setterArr[count] = new setterGetter(strArray[0], strArray[1]);
-        get(clientSocket, setterArr);
         new Thread(() -> {
           try {
             process(clientSocket);
+            String[] strArray = {"", ""};
+            strArray = set(clientSocket); 
+            setterGetter strObj = new setterGetter(strArray[0], strArray[1]);
+            get(clientSocket, strObj);
           } catch(Exception e) {
             System.out.println("Exception: " + e.getMessage());
           }
@@ -40,7 +39,7 @@ public class Main {
     }
   }
 
-  private static void get(Socket clientSocket, setterGetter[] setterArr) {
+  private static void get(Socket clientSocket, setterGetter strObj) {
     try(BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));) {
       String content;
@@ -48,9 +47,9 @@ public class Main {
         System.out.println("::" + content);
        if ("GET".equalsIgnoreCase(content)) {
           content = reader.readLine();
-          for(int i = 0; i < setterArr.length; i++) {
-            if(content.equalsIgnoreCase(setterArr[i].getter)) {
-              writer.write("$3\r\n" + setterArr[i].setString + "\r\n");
+          for(int i = 0; i < 1; i++) {
+            if(content.equalsIgnoreCase(strObj.getter)) {
+              writer.write("$3\r\n" + strObj.setString + "\r\n");
               writer.flush();
             }
           }  
