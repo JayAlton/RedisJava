@@ -1,8 +1,10 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Main {
+   private static final ConcurrentHashMap<String, String> dataStore = new ConcurrentHashMap<>();
   public static void main(String[] args){
     // You can use print statements as follows for debugging, they'll be visible when running tests.
     System.out.println("Logs from your program will appear here!");
@@ -20,16 +22,7 @@ public class Main {
       //int count = 0;
       while (true) {
         Socket clientSocket = serverSocket.accept();
-        new Thread(() -> {
-          try {
-            process(clientSocket);
-            String[] strArray = set(clientSocket); 
-            setterGetter strObj = new setterGetter(strArray[0], strArray[1]);
-            get(clientSocket, strObj);
-          } catch(Exception e) {
-            System.out.println("Exception: " + e.getMessage());
-          }
-        }).start();
+        new Thread(() -> handleClient(clientSocket)).start();
         //count++;
       }
       
@@ -38,71 +31,69 @@ public class Main {
     }
   }
 
-  private static void get(Socket clientSocket, setterGetter strObj) {
-    try(BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));) {
-      String content;
-      while((content = reader.readLine()) != null) {
-        System.out.println("::" + content);
-       if ("GET".equalsIgnoreCase(content)) {
-          content = reader.readLine();
-          for(int i = 0; i < 1; i++) {
-            if(content.equalsIgnoreCase(strObj.getter)) {
-              writer.write("$3\r\n" + strObj.setString + "\r\n");
-              writer.flush();
+  private static void handleClient(Socket clientSocket) {
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()))) {
+
+        String line;
+        while ((line = reader.readLine()) != null) {
+            System.out.println("::" + line);
+
+            if (line.startsWith("*")) {
+                // Multi-bulk request (e.g., SET key value)
+                int numArgs = Integer.parseInt(line.substring(1));
+                String[] args = new String[numArgs];
+                for (int i = 0; i < numArgs; i++) {
+                    reader.readLine(); // Read length line (e.g., $3)
+                    args[i] = reader.readLine(); // Read actual argument
+                }
+
+                processCommand(args, writer);
+            } else {
+                writer.write("-ERR Unknown command\r\n");
+                writer.flush();
             }
-          }  
         }
-      }
     } catch (IOException e) {
-      throw new RuntimeException(e);
+        System.out.println("Client disconnected: " + e.getMessage());
     }
   }
-  private static String[] set(Socket clientSocket) {
-    try(BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));) {
-      String content;
-      String setter;
-      String str;
-      while((content = reader.readLine()) != null) {
-        System.out.println("::" + content);
-       if ("SET".equalsIgnoreCase(content)) {
-          reader.readLine();
-          setter = reader.readLine();
-          reader.readLine();
-          str = reader.readLine();
-          writer.write("+OK\r\n");
+
+  private static void processCommand(String[] args, BufferedWriter writer) throws IOException {
+      if (args.length < 1) {
+          writer.write("-ERR Missing command\r\n");
           writer.flush();
-          return new String[]{setter, str};
-        }
+          return;
       }
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-    return new String[]{"", ""};
-  }
-  private static void process(Socket clientSocket) {
-    try(BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));) {
-      String content;
-      while((content = reader.readLine()) != null) {
-        System.out.println("::" + content);
-        if("ping".equalsIgnoreCase(content)) {
-          writer.write("+PONG\r\n");
-          writer.flush();
-        } else if("ECHO".equalsIgnoreCase(content)) {
-          for(int i = 0; i < 2; i++) {
-            content = reader.readLine();
-          }
-          writer.write("+" + content + "\r\n");
-          writer.flush();
-        } else if ("eof".equalsIgnoreCase(content)) {
-          System.out.println("eof");
-        }
+
+      String command = args[0].toUpperCase();
+      switch (command) {
+          case "SET":
+              if (args.length != 3) {
+                  writer.write("-ERR Wrong number of arguments for SET\r\n");
+              } else {
+                  dataStore.put(args[1], args[2]);
+                  writer.write("+OK\r\n");
+              }
+              break;
+
+          case "GET":
+              if (args.length != 2) {
+                  writer.write("-ERR Wrong number of arguments for GET\r\n");
+              } else {
+                  String value = dataStore.get(args[1]);
+                  if (value != null) {
+                      writer.write("$" + value.length() + "\r\n" + value + "\r\n");
+                  } else {
+                      writer.write("$-1\r\n");
+                  }
+              }
+              break;
+
+          default:
+              writer.write("-ERR Unknown command\r\n");
       }
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+      writer.flush();
   }
 }
 
