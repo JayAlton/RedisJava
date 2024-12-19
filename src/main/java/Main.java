@@ -22,9 +22,7 @@ public class Main {
       while (true) {
         Socket clientSocket = serverSocket.accept();
         new Thread(() -> handleClient(clientSocket)).start();
-        if(expiryTime != 0) {
-          expiryTime-=100;
-        }
+        
       }
       
     } catch (IOException e) {
@@ -39,7 +37,9 @@ public class Main {
         String line;
         while ((line = reader.readLine()) != null) {
             System.out.println("::" + line);
-
+            if(expiryTime != 0) {
+              expiryTime-=100;
+            }
             if (line.startsWith("*")) {
                 // Multi-bulk request (e.g., SET key value)
                 int numArgs = Integer.parseInt(line.substring(1));
@@ -101,7 +101,6 @@ public class Main {
                   writer.write("-ERR Wrong number of arguments for GET\r\n");
               } else {
                   String value = dataStore.get(args[1]);
-                  System.out.println(expiryTime);
                   if (value != null && expiryTime != 0) {
                       writer.write("$" + value.length() + "\r\n" + value + "\r\n");
                   } else {
