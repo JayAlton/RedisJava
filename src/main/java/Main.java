@@ -122,7 +122,7 @@ public class Main {
               }
               break;
 
-          case "CONFIG GET":
+          case "CONFIG":
               if(args[1].equalsIgnoreCase("GET")) {
                 String ans = "*2\r\n";
                 if(args[2].equalsIgnoreCase("dir")) {
