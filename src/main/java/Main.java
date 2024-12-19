@@ -41,7 +41,7 @@ public class Main {
           writer.write("+PONG\r\n");
           writer.flush();
         } else if ("SET".equalsIgnoreCase(content)) {
-          writer.write("+0K\r\n");
+          writer.write("+OK\r\n");
           writer.flush();
         } else if ("GET".equalsIgnoreCase(content)) {
           writer.write("$3\r\nbar\r\n");
