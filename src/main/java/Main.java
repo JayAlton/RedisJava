@@ -23,7 +23,7 @@ public class Main {
         Socket clientSocket = serverSocket.accept();
         new Thread(() -> handleClient(clientSocket)).start();
         if(expiryTime != 0) {
-          expiryTime--;
+          expiryTime-=100;
         }
       }
       
