@@ -10,13 +10,16 @@ import java.util.concurrent.TimeUnit;
 public class Main {
    private static final ConcurrentHashMap<String, String> dataStore = new ConcurrentHashMap<>();
    private static final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-   private static String dir = "/tmp/redis-files";
-   private static String fileName = "dump.rdb";
+   private static String dir =  null;
+   private static String fileName = null;
 
   public static void main(String[] args){
     // You can use print statements as follows for debugging, they'll be visible when running tests.
     System.out.println("Logs from your program will appear here!");
-    // Uncomment this block to pass the first stage 
+    if(args.length > 0) {
+      dir = args[1];
+      fileName = args[3];
+    } 
     ServerSocket serverSocket = null;
     int port = 6379;
     
