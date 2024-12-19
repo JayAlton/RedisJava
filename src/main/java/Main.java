@@ -67,6 +67,7 @@ public class Main {
       while((content = reader.readLine()) != null) {
         System.out.println("::" + content);
        if ("SET".equalsIgnoreCase(content)) {
+          reader.readLine();
           setter = reader.readLine();
           str = reader.readLine();
           writer.write("+OK\r\n");
