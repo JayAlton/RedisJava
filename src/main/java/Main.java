@@ -5,6 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Main {
    private static final ConcurrentHashMap<String, String> dataStore = new ConcurrentHashMap<>();
+   private static int expiryTime = 0;
   public static void main(String[] args){
     // You can use print statements as follows for debugging, they'll be visible when running tests.
     System.out.println("Logs from your program will appear here!");
@@ -23,7 +24,9 @@ public class Main {
       while (true) {
         Socket clientSocket = serverSocket.accept();
         new Thread(() -> handleClient(clientSocket)).start();
-        //count++;
+        if(expiryTime != 0) {
+          expiryTime--;
+        }
       }
       
     } catch (IOException e) {
@@ -83,11 +86,15 @@ public class Main {
             }
             break;
           case "SET":
-              if (args.length != 3) {
+              if (args.length != 3 || args.length != 5) {
                   writer.write("-ERR Wrong number of arguments for SET\r\n");
-              } else {
+              } else if (args.length == 3) {
                   dataStore.put(args[1], args[2]);
                   writer.write("+OK\r\n");
+              } else if (args.length == 5) {
+                dataStore.put(args[1], args[2]);
+                expiryTime = Integer.parseInt(args[4]);
+                writer.write("+OK\r\n");
               }
               break;
 
@@ -96,7 +103,7 @@ public class Main {
                   writer.write("-ERR Wrong number of arguments for GET\r\n");
               } else {
                   String value = dataStore.get(args[1]);
-                  if (value != null) {
+                  if (value != null && expiryTime != 0) {
                       writer.write("$" + value.length() + "\r\n" + value + "\r\n");
                   } else {
                       writer.write("$-1\r\n");
