@@ -21,6 +21,7 @@ public class Main {
       while (true) {
         Socket clientSocket = serverSocket.accept();
         String[] strArray = {"", ""};
+        System.out.println(set(clientSocket));
         strArray = set(clientSocket); 
         setterArr[count] = new setterGetter(strArray[0], strArray[1]);
         get(clientSocket, setterArr);
@@ -74,7 +75,6 @@ public class Main {
           str = reader.readLine();
           writer.write("+OK\r\n");
           writer.flush();
-          System.out.println("Setter + getter: " + setter + " + " + str);
           return new String[]{setter, str};
         }
       }
