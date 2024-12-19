@@ -134,6 +134,7 @@ public class Main {
                 }
                 writer.write(ans);
               }
+              break;
           default:
               writer.write("-ERR Unknown command\r\n");
       }
