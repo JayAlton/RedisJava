@@ -101,6 +101,7 @@ public class Main {
                   writer.write("-ERR Wrong number of arguments for GET\r\n");
               } else {
                   String value = dataStore.get(args[1]);
+                  System.out.println(expiryTime);
                   if (value != null && expiryTime != 0) {
                       writer.write("$" + value.length() + "\r\n" + value + "\r\n");
                   } else {
