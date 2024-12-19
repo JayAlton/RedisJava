@@ -10,7 +10,6 @@ import java.util.concurrent.TimeUnit;
 public class Main {
    private static final ConcurrentHashMap<String, String> dataStore = new ConcurrentHashMap<>();
    private static final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-   private static int expiryTime = 0;
   public static void main(String[] args){
     // You can use print statements as follows for debugging, they'll be visible when running tests.
     System.out.println("Logs from your program will appear here!");
@@ -42,9 +41,6 @@ public class Main {
         String line;
         while ((line = reader.readLine()) != null) {
             System.out.println("::" + line);
-            if(expiryTime != 0) {
-              expiryTime-=10;
-            }
             if (line.startsWith("*")) {
                 // Multi-bulk request (e.g., SET key value)
                 int numArgs = Integer.parseInt(line.substring(1));
@@ -112,7 +108,7 @@ public class Main {
                   writer.write("-ERR Wrong number of arguments for GET\r\n");
               } else {
                   String value = dataStore.get(args[1]);
-                  if (value != null && expiryTime != 0) {
+                  if (value != null) {
                       writer.write("$" + value.length() + "\r\n" + value + "\r\n");
                   } else {
                       writer.write("$-1\r\n");
