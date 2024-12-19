@@ -9,17 +9,20 @@ public class Main {
     // Uncomment this block to pass the first stage 
     ServerSocket serverSocket = null;
     int port = 6379;
-    String globalString = "";
+    
     try {
       serverSocket = new ServerSocket(port);
       // Since the tester restarts your program quite often, setting SO_REUSEADDR
       // ensures that we don't run into 'Address already in use' errors
       serverSocket.setReuseAddress(true);
       // Wait for connections from clients.
+      setterGetter[] setterArr = new setterGetter[]{};
+      int count = 0;
       while (true) {
         Socket clientSocket = serverSocket.accept();
-        globalString = set(clientSocket);
-        get(clientSocket, globalString);
+        String[] strArray = set(clientSocket); 
+        setterArr[count] = new setterGetter(strArray[0], strArray[1]);
+        get(clientSocket, setterArr);
         new Thread(() -> {
           try {
             process(clientSocket);
@@ -27,6 +30,7 @@ public class Main {
             System.out.println("Exception: " + e.getMessage());
           }
         }).start();
+        count++;
       }
       
     } catch (IOException e) {
@@ -34,38 +38,46 @@ public class Main {
     }
   }
 
-  private static void get(Socket clientSocket, String globalString) {
+  private static void get(Socket clientSocket, setterGetter[] setterArr) {
     try(BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));) {
       String content;
       while((content = reader.readLine()) != null) {
         System.out.println("::" + content);
        if ("GET".equalsIgnoreCase(content)) {
-          writer.write("$3\r\n" + globalString + "\r\n");
-          writer.flush();  
+          content = reader.readLine();
+          for(int i = 0; i < setterArr.length; i++) {
+            if(content.equalsIgnoreCase(setterArr[i].getter)) {
+              writer.write("$3\r\n" + setterArr[i].setString + "\r\n");
+              writer.flush();
+            }
+          }  
         }
       }
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
-  private static String set(Socket clientSocket) {
+  private static String[] set(Socket clientSocket) {
     try(BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));) {
       String content;
+      String setter;
+      String str;
       while((content = reader.readLine()) != null) {
         System.out.println("::" + content);
        if ("SET".equalsIgnoreCase(content)) {
+          setter = reader.readLine();
+          str = reader.readLine();
           writer.write("+OK\r\n");
           writer.flush();
-          reader.readLine();
-          return reader.readLine();
+          return new String[]{setter, str};
         }
       }
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-    return "";
+    return new String[]{""};
   }
   private static void process(Socket clientSocket) {
     try(BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -91,3 +103,4 @@ public class Main {
     }
   }
 }
+
