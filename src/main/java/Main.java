@@ -19,8 +19,6 @@ public class Main {
       // ensures that we don't run into 'Address already in use' errors
       serverSocket.setReuseAddress(true);
       // Wait for connections from clients.
-     // setterGetter[] setterArr = new setterGetter[]{};
-      //int count = 0;
       while (true) {
         Socket clientSocket = serverSocket.accept();
         new Thread(() -> handleClient(clientSocket)).start();
@@ -86,7 +84,7 @@ public class Main {
             }
             break;
           case "SET":
-              if (args.length != 3 || args.length != 5) {
+              if (args.length != 3 && args.length != 5) {
                   writer.write("-ERR Wrong number of arguments for SET\r\n");
               } else if (args.length == 3) {
                   dataStore.put(args[1], args[2]);
