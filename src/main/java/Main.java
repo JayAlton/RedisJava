@@ -20,7 +20,7 @@ public class Main {
       int count = 0;
       while (true) {
         Socket clientSocket = serverSocket.accept();
-        String[] strArray = {"", ""}
+        String[] strArray = {"", ""};
         strArray = set(clientSocket); 
         setterArr[count] = new setterGetter(strArray[0], strArray[1]);
         get(clientSocket, setterArr);
