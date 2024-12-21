@@ -15,7 +15,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 // Build Redis
 public class Main {
-  private static int port; 
+  private static final int port = 6379;
   public static Map<String, String> data = new ConcurrentHashMap<>();
   public static Map<String, LocalDateTime> expiryTimes =
       new ConcurrentHashMap<>();
@@ -152,8 +152,6 @@ public class Main {
   }
   public static void main(String[] args) throws ClosedChannelException {
     try {
-      // check for --port flag
-      port = (args != null && args.length > 1) ? Integer.parseInt(args[1]) : 6379;
       // create Selector for monitoring channels
       Selector selector = Selector.open();
       // create a non-blocking server socket channel
@@ -165,12 +163,10 @@ public class Main {
       serverChannel.register(selector, SelectionKey.OP_ACCEPT);
       ByteBuffer buffer = ByteBuffer.allocate(256);
       System.out.println("Server is running on port " + port);
-      if(args[1].equalsIgnoreCase("--dir")) {
-        if (args.length > 0) {
-            dir = args[1];
-            dbfilename = args[3];
-            loadRDBFile();
-          }
+      if (args.length > 0) {
+        dir = args[1];
+        dbfilename = args[3];
+        loadRDBFile();
       }
       // Event loop
       while (true) {
