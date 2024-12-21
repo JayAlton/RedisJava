@@ -153,7 +153,22 @@ public class Main {
   public static void main(String[] args) throws ClosedChannelException {
     try {
       // check for --port flag
-      port = (args != null && args.length > 1) ? Integer.parseInt(args[1]) : 6379;
+      if (args != null && args.length > 0) {
+        if (args[0].equalsIgnoreCase("--port") && args.length > 1) {
+            port = Integer.parseInt(args[1]);
+        } else {
+            // Default port if --port is not provided
+            port = 6379;
+        }
+
+        if (args.length > 2 && args[0].equalsIgnoreCase("--dir") && args.length > 3) {
+            dir = args[1];
+            dbfilename = args[3];
+            loadRDBFile();
+        }
+    } else {
+        port = 6379;
+    }
       // create Selector for monitoring channels
       Selector selector = Selector.open();
       // create a non-blocking server socket channel
@@ -165,13 +180,6 @@ public class Main {
       serverChannel.register(selector, SelectionKey.OP_ACCEPT);
       ByteBuffer buffer = ByteBuffer.allocate(256);
       System.out.println("Server is running on port " + port);
-      if(!args[0].equalsIgnoreCase("--port")) {
-        if (args.length > 0) {
-            dir = args[1];
-            dbfilename = args[3];
-            loadRDBFile();
-          }
-      }
       // Event loop
       while (true) {
         // Select ready channels using the selector
