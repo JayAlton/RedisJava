@@ -21,15 +21,19 @@ public class Main {
       dir = args[1];
       fileName = args[3];
     } 
-    ServerSocket serverSocket = null;
     int port = 6379;
     
-    try {
-      inputStream = new FileInputStream(dir + "/" + fileName);
-      serverSocket = new ServerSocket(port);
+    try (ServerSocket serverSocket = new ServerSocket(port)){
       // Since the tester restarts your program quite often, setting SO_REUSEADDR
       // ensures that we don't run into 'Address already in use' errors
       serverSocket.setReuseAddress(true);
+      File rdbFile = new File(dir + "/" + fileName);
+      if(!rdbFile.exists()) {
+        System.out.println("RDB file not found: " + rdbFile.getPath());
+        return;
+      }
+
+      inputStream = new FileInputStream(rdbFile);
       // Wait for connections from clients.
       while (true) {
         Socket clientSocket = serverSocket.accept();
