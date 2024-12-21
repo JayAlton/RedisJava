@@ -15,7 +15,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 // Build Redis
 public class Main {
-  private static int port = 6379;
+  private static int port; 
   public static Map<String, String> data = new ConcurrentHashMap<>();
   public static Map<String, LocalDateTime> expiryTimes =
       new ConcurrentHashMap<>();
@@ -150,29 +150,10 @@ public class Main {
       return 0;
     }
   }
-
-  private static void loadPort(String[] args) {
-    for(int i = 0; i < args.length; i++) {
-        if ("--port".equalsIgnoreCase(args[i])) {
-            if (i + 1 <args.length) {
-                try {
-                    port = Integer.parseInt(args[i+1]);
-                    System.out.println("Using port: " + port);
-                    return;
-                } catch(NumberFormatException e) {
-                    System.out.println("Invalid port number: " + args[i + 1]);
-                }
-            } else {
-                System.out.println("Port number missing after --port flag.");
-            }
-        }
-        port = 6379;
-    }
-
-    System.out.println("Port number missing after --port flag.");
-  }
   public static void main(String[] args) throws ClosedChannelException {
     try {
+      // check for --port flag
+      port = (args != null && args.length > 1) ? Integer.parseInt(args[1]) : 6379;
       // create Selector for monitoring channels
       Selector selector = Selector.open();
       // create a non-blocking server socket channel
@@ -184,15 +165,9 @@ public class Main {
       serverChannel.register(selector, SelectionKey.OP_ACCEPT);
       ByteBuffer buffer = ByteBuffer.allocate(256);
       System.out.println("Server is running on port " + port);
-      if (args.length > 0 && args.length < 3) {
-        dir = null;
-        dbfilename = null;
-        loadPort(args);
-        loadRDBFile();
-      } else {
+      if (args.length > 0) {
         dir = args[1];
         dbfilename = args[3];
-        loadPort(args);
         loadRDBFile();
       }
       // Event loop
