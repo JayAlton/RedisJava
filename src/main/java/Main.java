@@ -153,7 +153,7 @@ public class Main {
   public static void main(String[] args) throws ClosedChannelException {
     try {
         if (args != null && args.length > 0) {
-            if (args[0].equalsIgnoreCase("--port") && args.length > 1) {
+            if ((args[0].equalsIgnoreCase("--port") || args[0].equalsIgnoreCase("-p")) && args.length > 1) {
                 port = Integer.parseInt(args[1]);
             } else {
                 // Default port if --port is not provided
@@ -338,6 +338,9 @@ public class Main {
                   clientChannel.write(
                       ByteBuffer.wrap(response.toString().getBytes()));
                 }
+                break;
+              case "INFO": 
+                System.out.println("Recieved INFO command");
                 break;
               default:
                 break;
