@@ -17,36 +17,27 @@ public class Main {
   public static void main(String[] args){
     // You can use print statements as follows for debugging, they'll be visible when running tests.
     System.out.println("Logs from your program will appear here!");
-    int port = 6379;
-    File dirFile = new File(dir);
-    if (dirFile.exists() && dirFile.isDirectory()) {
-      String[] files = dirFile.list();
-      if (files != null) {
-          System.out.println("Files in directory: " + String.join(", ", files));
-      } else {
-          System.out.println("No files found in directory.");
+    for (int i = 0; i < args.length; i++) {
+      if (args[i].equals("--dir") && i + 1 < args.length) {
+          dir = args[i + 1];
+      } else if (args[i].equals("--dbfilename") && i + 1 < args.length) {
+          fileName = args[i + 1];
       }
     }
-    
-    File rdbFile = new File(dirFile, fileName);
-    if (!waitForFile(rdbFile, 5, 500)) { // Retry 5 times with 500ms interval
-        System.out.println("RDB file not found: " + rdbFile.getAbsolutePath());
-        return;
-    }
-    
-    try (InputStream inputStream = new FileInputStream(rdbFile)) {
-        Main.inputStream = inputStream; // Assign to static variable for later use
-        System.out.println("RDB file loaded successfully: " + rdbFile.getAbsolutePath());
-    } catch (IOException e) {
-        System.out.println("IOException while reading RDB file: " + e.getMessage());
-        return;
-    }
-    
+
+    int port = 6379;
     
     try (ServerSocket serverSocket = new ServerSocket(port)){
       // Since the tester restarts your program quite often, setting SO_REUSEADDR
       // ensures that we don't run into 'Address already in use' errors
       serverSocket.setReuseAddress(true);
+      File rdbFile = new File(dir + "/" + fileName);
+      if(!rdbFile.exists()) {
+        System.out.println("RDB file not found: " + rdbFile.getPath());
+        return;
+      }
+
+      inputStream = new FileInputStream(rdbFile);
       // Wait for connections from clients.
       while (true) {
         Socket clientSocket = serverSocket.accept();
@@ -241,23 +232,6 @@ public class Main {
       }
 
       return length;
-    }
-
-    public static boolean waitForFile(File file, int maxRetries, long intervalMs) {
-      int attempts = 0;
-      while (attempts < maxRetries) {
-          if (file.exists()) {
-              return true; // File exists, return true
-          }
-          attempts++;
-          try {
-              Thread.sleep(intervalMs); // Wait before retrying
-          } catch (InterruptedException e) {
-              System.out.println("Waiting interrupted: " + e.getMessage());
-              return false;
-          }
-      }
-      return false; // File didn't appear after maxRetries attempts
     }
 }
 
