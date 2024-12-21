@@ -15,7 +15,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 // Build Redis
 public class Main {
-  private static final int port = 6379;
+  private static int port = 6379;
   public static Map<String, String> data = new ConcurrentHashMap<>();
   public static Map<String, LocalDateTime> expiryTimes =
       new ConcurrentHashMap<>();
@@ -150,6 +150,25 @@ public class Main {
       return 0;
     }
   }
+
+  private static void loadPort(String[] args) {
+    for(int i = 0; i < args.length; i++) {
+        if ("--port".equals(args[i])) {
+            if (i + 1 <args.length) {
+                try {
+                    port = Integer.parseInt(args[i+1]);
+                    System.out.println("Using port: " + port);
+                } catch(NumberFormatException e) {
+                    System.out.println("Invalid port number: " + args[i + 1]);
+                }
+            } else {
+                System.out.println("Port number missing after --port flag.");
+            }
+        }
+    }
+
+    System.out.println("Port number missing after --port flag.");
+  }
   public static void main(String[] args) throws ClosedChannelException {
     try {
       // create Selector for monitoring channels
@@ -166,6 +185,7 @@ public class Main {
       if (args.length > 0) {
         dir = args[1];
         dbfilename = args[3];
+        loadPort(args);
         loadRDBFile();
       }
       // Event loop
