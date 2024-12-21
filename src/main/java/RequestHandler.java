@@ -16,6 +16,11 @@ public class RequestHandler implements Runnable {
     private Socket clientSocket;
     private String[] args;
 
+    public RequestHandler(Socket clientSocket, String[] args) {
+        this.clientSocket = clientSocket;
+        this.args = args;
+    }
+    
     @Override
     public void run() {
         Path dir = Path.of("");
