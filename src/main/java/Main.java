@@ -17,10 +17,13 @@ public class Main {
   public static void main(String[] args){
     // You can use print statements as follows for debugging, they'll be visible when running tests.
     System.out.println("Logs from your program will appear here!");
-    if(args.length > 0) {
-      dir = args[1];
-      fileName = args[3];
-    } 
+    for (int i = 0; i < args.length; i++) {
+      if (args[i].equals("--dir") && i + 1 < args.length) {
+          dir = args[i + 1];
+      } else if (args[i].equals("--dbfilename") && i + 1 < args.length) {
+          fileName = args[i + 1];
+      }
+    }
     int port = 6379;
     
     try (ServerSocket serverSocket = new ServerSocket(port)){
