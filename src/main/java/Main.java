@@ -66,10 +66,49 @@ public class Main {
         if (!key.isEmpty()) {
           data.put(key, value);
         }
+      } 
+      else if (sectionType == (byte)0xFC) {
+        long expiryMillis = readTimeMS(fileBuffer);
+        readString(fileBuffer);
+        String key = readString(fileBuffer);
+        String value = readString(fileBuffer);
+        LocalDateTime expirationTime = LocalDateTime.ofEpochSecond(expiryMillis / 1000, (int) (expiryMillis % 1000) * 1_000_000, java.time.ZoneOffset.UTC);
+        
+        System.out.println("Loaded Key: " + key + " Value: " + value + "Expiry: " + expirationTime);
+
+        if (!key.isEmpty()) {
+            data.put(key, value);
+            expiryTimes.put(key, expirationTime);
+        }
+      } else if (sectionType == (byte)0xFD) {
+        long expiryTime = readTimeMS(fileBuffer);
+        readString(fileBuffer);
+        String key = readString(fileBuffer);
+        String value = readString(fileBuffer);
+        LocalDateTime expirationTime = LocalDateTime.ofEpochSecond(expiryTime, 0, java.time.ZoneOffset.UTC);
+        
+        System.out.println("Loaded Key: " + key + " Value: " + value + "Expiry: " + expirationTime);
+
+        if (!key.isEmpty()) {
+            data.put(key, value);
+            expiryTimes.put(key, expirationTime);
+        }
       } else if (sectionType == (byte)0xFF) {
         break;
-      }
+      } 
     }
+  }
+
+  private static long readTimeSeconds(ByteBuffer fileBuffer) {
+    int unsigned_int = fileBuffer.getInt();
+    long unixTimeStamp = unsigned_int & 0xFFFFFFFFL;
+    return unixTimeStamp;
+  }
+  
+  private static long readTimeMS(ByteBuffer fileBuffer) {
+    // Java long is already 8 bytes so no need to mask
+    long unsigned_long = fileBuffer.getLong();
+    return unsigned_long;
   }
   private static String readString(ByteBuffer fileBuffer) {
     int size = readSize(fileBuffer);
@@ -95,14 +134,14 @@ public class Main {
       int encodingType =
           firstByte & 0x3F; // The remaining 6 bits tell us the type
       switch (encodingType) {
-      case 0x00: // 0xC0 - 8-bit integer encoding
-        return buffer.get();
-      case 0x01: // 0xC1 - 16-bit integer encoding (little-endian)
-        return buffer.getShort() & 0xFFFF; // convert short to unsigned int
-      case 0x02: // 0xC2 - 32-bit integer encoding (little-endian)
-        return buffer.getInt();
-      default:
-        System.out.println("Unknown encoding tpye: " + encodingType);
+        case 0x00: // 0xC0 - 8-bit integer encoding
+            return buffer.get();
+        case 0x01: // 0xC1 - 16-bit integer encoding (little-endian)
+            return buffer.getShort() & 0xFFFF; // convert short to unsigned int
+        case 0x02: // 0xC2 - 32-bit integer encoding (little-endian)
+            return buffer.getInt();
+        default:
+        System.out.println("Unknown encoding type: " + encodingType);
         buffer.position(buffer.position() + 1);
         return 0;
       }
