@@ -169,8 +169,8 @@ public class Main {
         dir = args[1];
         dbfilename = args[3];
         loadRDBFile();
-      } else {
-        dir = null;
+      } else if (args.length > 2) {
+        dir = args[1];
         dbfilename = null;
         loadRDBFile();
       }
