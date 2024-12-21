@@ -31,7 +31,7 @@ public class Main {
       // Since the tester restarts your program quite often, setting SO_REUSEADDR
       // ensures that we don't run into 'Address already in use' errors
       serverSocket.setReuseAddress(true);
-      File rdbFile = new File(dir + "/" + fileName);
+      File rdbFile = new File(dir + File.separator + fileName);
       System.out.println("New File directory: " + dir + "/" + fileName);
       System.out.println(rdbFile);
       if(!rdbFile.exists()) {
