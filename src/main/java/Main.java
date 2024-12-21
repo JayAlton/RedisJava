@@ -169,7 +169,11 @@ public class Main {
         dir = args[1];
         dbfilename = args[3];
         loadRDBFile();
-      } 
+      } else if (args.length > 0) {
+        dir = args[1];
+        dbfilename = args[3];
+        loadRDBFile();
+      }
       // Event loop
       while (true) {
         // Select ready channels using the selector
