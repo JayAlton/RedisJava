@@ -33,6 +33,7 @@ public class Main {
       serverSocket.setReuseAddress(true);
       File rdbFile = new File(dir + "/" + fileName);
       System.out.println("New File directory: " + dir + "/" + fileName);
+      System.out.println(rdbFile);
       if(!rdbFile.exists()) {
         System.out.println("RDB file not found: " + rdbFile.getPath());
         return;
