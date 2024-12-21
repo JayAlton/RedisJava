@@ -15,7 +15,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 // Build Redis
 public class Main {
-  private static int port; 
+  private static int port;
   public static Map<String, String> data = new ConcurrentHashMap<>();
   public static Map<String, LocalDateTime> expiryTimes =
       new ConcurrentHashMap<>();
@@ -132,7 +132,7 @@ public class Main {
     } else if (firstTwoBits == 3) {
       // 0b11 - Special encoding
       int encodingType =
-          firstByte & 0x3F; // The remaining 6 bits tell us the type 
+          firstByte & 0x3F; // The remaining 6 bits tell us the type
       switch (encodingType) {
         case 0x00: // 0xC0 - 8-bit integer encoding
             return buffer.get();
@@ -141,9 +141,9 @@ public class Main {
         case 0x02: // 0xC2 - 32-bit integer encoding (little-endian)
             return buffer.getInt();
         default:
-            System.out.println("Unknown encoding type: " + encodingType);
-            buffer.position(buffer.position() + 1);
-            return 0;
+        System.out.println("Unknown encoding type: " + encodingType);
+        buffer.position(buffer.position() + 1);
+        return 0;
       }
     } else {
       System.out.println("Unsupported size encoding");
@@ -152,23 +152,22 @@ public class Main {
   }
   public static void main(String[] args) throws ClosedChannelException {
     try {
-      // check for --port flag
-      if (args != null && args.length > 0) {
-        if (args[0].equalsIgnoreCase("--port") && args.length > 1) {
-            port = Integer.parseInt(args[1]);
+        if (args != null && args.length > 0) {
+            if (args[0].equalsIgnoreCase("--port") && args.length > 1) {
+                port = Integer.parseInt(args[1]);
+            } else {
+                // Default port if --port is not provided
+                port = 6379;
+            }
+    
+            if (args.length > 2 && args[0].equalsIgnoreCase("--dir") && args.length > 3) {
+                dir = args[1];
+                dbfilename = args[3];
+                loadRDBFile();
+            }
         } else {
-            // Default port if --port is not provided
             port = 6379;
         }
-
-        if (args.length > 2 && args[0].equalsIgnoreCase("--dir") && args.length > 3) {
-            dir = args[1];
-            dbfilename = args[3];
-            loadRDBFile();
-        }
-    } else {
-        port = 6379;
-    }
       // create Selector for monitoring channels
       Selector selector = Selector.open();
       // create a non-blocking server socket channel
@@ -180,6 +179,11 @@ public class Main {
       serverChannel.register(selector, SelectionKey.OP_ACCEPT);
       ByteBuffer buffer = ByteBuffer.allocate(256);
       System.out.println("Server is running on port " + port);
+      if (args.length > 0) {
+        dir = args[1];
+        dbfilename = args[3];
+        loadRDBFile();
+      }
       // Event loop
       while (true) {
         // Select ready channels using the selector
