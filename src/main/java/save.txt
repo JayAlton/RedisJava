@@ -1,0 +1,27 @@
+if (args != null && args.length > 0) {
+            if ((args[0].equalsIgnoreCase("--port") || args[0].equalsIgnoreCase("-p")) && args.length > 1) {
+                port = Integer.parseInt(args[1]);
+                if(args.length > 2) {
+                    if(args[2].equalsIgnoreCase("--replicaof")) {
+                        role = "slave";
+                    }
+                }
+            } else {
+                // Default port if --port is not provided
+                port = 6379;
+            }
+    
+            if (args.length > 2 && args[0].equalsIgnoreCase("--dir") && args.length > 3) {
+                dir = args[1];
+                dbfilename = args[3];
+                loadRDBFile();
+            }
+        } else {
+            port = 6379;
+        }
+
+
+        case "INFO": 
+                System.out.println("Recieved INFO command");
+                clientChannel.write(ByteBuffer.wrap(("$" + (5 + role.length()) + "\r\nrole:" + role + "\r\n").getBytes()));
+                break;
