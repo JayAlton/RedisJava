@@ -182,7 +182,10 @@ public class Main {
       serverChannel.register(selector, SelectionKey.OP_ACCEPT);
       ByteBuffer buffer = ByteBuffer.allocate(256);
       System.out.println("Server is running on port " + port);
-      if (args.length > 0) {
+      if (args.length > 0 && args.length < 2) {
+        loadPort(args);
+        loadRDBFile();
+      } else {
         dir = args[1];
         dbfilename = args[3];
         loadPort(args);
