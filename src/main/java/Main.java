@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 // Build Redis
 public class Main {
   private static int port;
-  private static String role;
+  private static String role = "";
   public static Map<String, String> data = new ConcurrentHashMap<>();
   public static Map<String, LocalDateTime> expiryTimes =
       new ConcurrentHashMap<>();
