@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 // Build Redis
 public class Main {
   private static int port;
-  private static String role = "";
+  private static String role = "master";
   public static Map<String, String> data = new ConcurrentHashMap<>();
   public static Map<String, LocalDateTime> expiryTimes =
       new ConcurrentHashMap<>();
@@ -159,8 +159,6 @@ public class Main {
                 if(args.length > 2) {
                     if(args[2].equalsIgnoreCase("--replicaof")) {
                         role = "slave";
-                    } else {
-                        role = "master";
                     }
                 }
             } else {
