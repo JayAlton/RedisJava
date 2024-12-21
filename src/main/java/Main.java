@@ -169,7 +169,7 @@ public class Main {
         dir = args[1];
         dbfilename = args[3];
         loadRDBFile();
-      } else if (args.length > 0) {
+      } else if (args.length > 2) {
         dir = args[1];
         dbfilename = args[3];
         loadRDBFile();
