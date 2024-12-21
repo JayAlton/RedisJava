@@ -3,7 +3,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -18,40 +17,19 @@ public class Main {
   public static void main(String[] args){
     // You can use print statements as follows for debugging, they'll be visible when running tests.
     System.out.println("Logs from your program will appear here!");
-    for (int i = 0; i < args.length; i++) {
-      if (args[i].equals("--dir") && i + 1 < args.length) {
-          dir = args[i + 1];
-      } else if (args[i].equals("--dbfilename") && i + 1 < args.length) {
-          fileName = args[i + 1];
-      }
-    }
-
+    if(args.length > 0) {
+      dir = args[1];
+      fileName = args[3];
+    } 
+    ServerSocket serverSocket = null;
     int port = 6379;
     
-    try (ServerSocket serverSocket = new ServerSocket(port)){
+    try {
+      inputStream = new FileInputStream(dir + File.separator + fileName);
+      serverSocket = new ServerSocket(port);
       // Since the tester restarts your program quite often, setting SO_REUSEADDR
       // ensures that we don't run into 'Address already in use' errors
       serverSocket.setReuseAddress(true);
-      
-      File dirFile = new File(dir);
-      System.out.println("Directory contents: " + Arrays.toString(dirFile.list()));
-
-      File rdbFile = new File(dirFile + File.separator + fileName);
-      String fullPath = dirFile.getAbsolutePath() + File.separator + fileName;
-      System.out.println("Full path with escaped characters: '" + fullPath + "'");
-
-      System.out.println("Current working directory: " + System.getProperty("user.dir"));
-      System.out.println("File exists: " + rdbFile.exists());
-      System.out.println("Can read: " + rdbFile.canRead());
-      System.out.println("Can write: " + rdbFile.canWrite());
-      System.out.println("Is directory: " + rdbFile.isDirectory());
-
-      if(!rdbFile.exists()) {
-        System.out.println("RDB file not found: " + rdbFile.getPath());
-       // return;
-      }
-
-      inputStream = new FileInputStream(rdbFile);
       // Wait for connections from clients.
       while (true) {
         Socket clientSocket = serverSocket.accept();
@@ -160,9 +138,6 @@ public class Main {
               }
               break;
           case "KEYS":
-            if (args.length != 2 || !"*".equals(args[1])) {
-              writer.write("-ERR Only '*' pattern is supported\r\n");
-            }
             String key = "foo";
             byte[] redis = new byte[5];
             byte[] version = new byte[4];
