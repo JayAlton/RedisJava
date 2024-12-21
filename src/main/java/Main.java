@@ -31,8 +31,9 @@ public class Main {
       // Since the tester restarts your program quite often, setting SO_REUSEADDR
       // ensures that we don't run into 'Address already in use' errors
       serverSocket.setReuseAddress(true);
-      File rdbFile = new File(dir + File.separator + fileName);
+      
       File dirFile = new File(dir);
+      File rdbFile = new File(dirFile + File.separator + fileName);
       String fullPath = dirFile.getAbsolutePath() + File.separator + fileName;
       System.out.println("Full path with escaped characters: '" + fullPath + "'");
 
