@@ -132,7 +132,7 @@ public class Main {
     } else if (firstTwoBits == 3) {
       // 0b11 - Special encoding
       int encodingType =
-          firstByte & 0x3F; // The remaining 6 bits tell us the type
+          firstByte & 0x3F; // The remaining 6 bits tell us the type 
       switch (encodingType) {
         case 0x00: // 0xC0 - 8-bit integer encoding
             return buffer.get();
@@ -140,10 +140,12 @@ public class Main {
             return buffer.getShort() & 0xFFFF; // convert short to unsigned int
         case 0x02: // 0xC2 - 32-bit integer encoding (little-endian)
             return buffer.getInt();
+        case 0x59:
+            return buffer.get();
         default:
-        System.out.println("Unknown encoding type: " + encodingType);
-        buffer.position(buffer.position() + 1);
-        return 0;
+            System.out.println("Unknown encoding type: " + encodingType);
+            buffer.position(buffer.position() + 1);
+            return 0;
       }
     } else {
       System.out.println("Unsupported size encoding");
