@@ -341,7 +341,7 @@ public class Main {
                 break;
               case "INFO": 
                 System.out.println("Recieved INFO command");
-                clientChannel.write(ByteBuffer.wrap("role:master".getBytes()));
+                clientChannel.write(ByteBuffer.wrap(("$" + 11 + "\r\nrole:master\r\n").getBytes()));
                 break;
               default:
                 break;
