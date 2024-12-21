@@ -142,6 +142,9 @@ public class Main {
               }
               break;
           case "KEYS":
+            if (args.length != 2 || !"*".equals(args[1])) {
+              writer.write("-ERR Only '*' pattern is supported\r\n");
+            }
             String key = "foo";
             byte[] redis = new byte[5];
             byte[] version = new byte[4];
