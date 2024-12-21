@@ -108,25 +108,24 @@ public void run() {
                         break;
                     case "keys":
                         bufferedReader.readLine(); // Read the '*' symbol for the KEYS command
-                        String db_op = bufferedReader.readLine();
-                        switch (db_op) {
-                            case "*":
-                                // Send the number of keys in the store (array length)
-                                printWriter.print("*" + store.size() + "\r\n");
-                                
-                                // Iterate over the keys in the store and send each key in the RESP2 format
-                                for (String dbKey : store.keySet()) {
-                                    printWriter.print("$" + dbKey.length() + "\r\n" + dbKey + "\r\n");
-                                }
-                                printWriter.flush();
-                                break;
-                            default:
-                                // Handle other operations or invalid commands
-                                printWriter.print("-ERR Unknown operation\r\n");
-                                printWriter.flush();
-                                break;
+                        String db_op = bufferedReader.readLine(); // Read the rest of the command (should be "*")
+                        if (db_op.equals("*")) {
+                            // Prepare response in the expected format:
+                            // Send the number of keys in the store (array length)
+                            printWriter.print("*" + store.size() + "\r\n");
+                            
+                            // Iterate over the keys in the store and send each key in the RESP2 format
+                            for (String dbKey : store.keySet()) {
+                                printWriter.print("$" + dbKey.length() + "\r\n" + dbKey + "\r\n");
+                            }
+                            printWriter.flush();
+                        } else {
+                            // If something went wrong, return an error message
+                            printWriter.print("-ERR Unknown operation\r\n");
+                            printWriter.flush();
                         }
                         break;
+                    
                                      
                 }
             }
