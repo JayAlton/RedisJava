@@ -133,7 +133,7 @@ public class Client implements Runnable {
                                     break;
                                 }
                                 // Example: Assume reading a key with length
-                                int keyLength = lengthEncoding(fis);  // Get key length
+                                int keyLength = lengthEncoding(fis, b);  // Get key length
                                 byte[] keyBytes = new byte[keyLength];
                                 fis.read(keyBytes);
                                 key = new String(keyBytes);
