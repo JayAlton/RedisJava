@@ -3,6 +3,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -33,6 +34,8 @@ public class Main {
       serverSocket.setReuseAddress(true);
       
       File dirFile = new File(dir);
+      System.out.println("Directory contents: " + Arrays.toString(dirFile.list()));
+
       File rdbFile = new File(dirFile + File.separator + fileName);
       String fullPath = dirFile.getAbsolutePath() + File.separator + fileName;
       System.out.println("Full path with escaped characters: '" + fullPath + "'");
