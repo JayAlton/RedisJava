@@ -1,5 +1,3 @@
-import lombok.AllArgsConstructor;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,7 +11,6 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
-@AllArgsConstructor
 public class RequestHandler implements Runnable {
 
     private Socket clientSocket;
