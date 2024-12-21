@@ -36,7 +36,7 @@ public class Main {
       System.out.println(rdbFile);
       if(!rdbFile.exists()) {
         System.out.println("RDB file not found: " + rdbFile.getPath());
-        return;
+       // return;
       }
 
       inputStream = new FileInputStream(rdbFile);
