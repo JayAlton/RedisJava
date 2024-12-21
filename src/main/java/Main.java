@@ -81,7 +81,7 @@ public class Main {
             expiryTimes.put(key, expirationTime);
         }
       } else if (sectionType == (byte)0xFD) {
-        long expiryTime = readTimeMS(fileBuffer);
+        long expiryTime = readTimeSeconds(fileBuffer);
         readString(fileBuffer);
         String key = readString(fileBuffer);
         String value = readString(fileBuffer);
