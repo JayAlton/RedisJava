@@ -140,8 +140,6 @@ public class Main {
             return buffer.getShort() & 0xFFFF; // convert short to unsigned int
         case 0x02: // 0xC2 - 32-bit integer encoding (little-endian)
             return buffer.getInt();
-        case 0x3B:
-            return buffer.get();
         default:
             System.out.println("Unknown encoding type: " + encodingType);
             buffer.position(buffer.position() + 1);
