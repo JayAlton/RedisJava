@@ -106,32 +106,26 @@ public void run() {
                             printWriter.flush();
                         }
                         break;
-                    case "keys":
-                        bufferedReader.readLine();
+                        case "keys":
+                        bufferedReader.readLine(); // Reading the '*' token for KEYS command
                         String db_op = bufferedReader.readLine();
                         switch (db_op) {
                             case "*":
-                                int read;
-                                while ((read = inputStream.read()) != -1) {
-                                    if (read == 0xFB) {
-                                        getLen(inputStream);
-                                        getLen(inputStream);
-                                        break;
-                                    }
+                                // Construct the list of keys from the 'store' HashMap
+                                // Assume 'store' contains the keys from the database
+                                printWriter.print("*" + store.size() + "\r\n"); // Send the number of keys in the array
+                    
+                                for (String key : store.keySet()) {
+                                    printWriter.print("$" + key.length() + "\r\n" + key + "\r\n"); // Send each key in the correct RESP2 format
                                 }
-
-                                int type = inputStream.read();
-                                int len = getLen(inputStream);
-
-                                byte[] key_bytes = new byte[len];
-                                inputStream.read(key_bytes);
-                                String parsed_key = new String(key_bytes);
-                                printWriter.print("*1\r\n$" + parsed_key.length() + "\r\n" + parsed_key + "\r\n");
                                 printWriter.flush();
-
+                                break;
+                            default:
+                                printWriter.print("-ERR Unknown operation\r\n");
+                                printWriter.flush();
                                 break;
                         }
-                        break;
+                        break;                    
                 }
             }
         }
