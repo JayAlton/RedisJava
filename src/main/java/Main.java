@@ -32,6 +32,7 @@ public class Main {
       // ensures that we don't run into 'Address already in use' errors
       serverSocket.setReuseAddress(true);
       File rdbFile = new File(dir + "/" + fileName);
+      System.out.println("New File directory: " + dir + "/" + fileName);
       if(!rdbFile.exists()) {
         System.out.println("RDB file not found: " + rdbFile.getPath());
         return;
