@@ -185,11 +185,6 @@ public class Main {
       serverChannel.register(selector, SelectionKey.OP_ACCEPT);
       ByteBuffer buffer = ByteBuffer.allocate(256);
       System.out.println("Server is running on port " + port);
-      if (args.length > 0) {
-        dir = args[1];
-        dbfilename = args[3];
-        loadRDBFile();
-      }
       // Event loop
       while (true) {
         // Select ready channels using the selector
