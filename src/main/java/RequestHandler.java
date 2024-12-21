@@ -106,7 +106,7 @@ public void run() {
                             printWriter.flush();
                         }
                         break;
-                        case "keys":
+                    case "keys":
                         bufferedReader.readLine(); // Reading the '*' token for KEYS command
                         String db_op = bufferedReader.readLine();
                         switch (db_op) {
@@ -115,8 +115,8 @@ public void run() {
                                 // Assume 'store' contains the keys from the database
                                 printWriter.print("*" + store.size() + "\r\n"); // Send the number of keys in the array
                     
-                                for (String key : store.keySet()) {
-                                    printWriter.print("$" + key.length() + "\r\n" + key + "\r\n"); // Send each key in the correct RESP2 format
+                                for (String dbkey : store.keySet()) {
+                                    printWriter.print("$" + dbkey.length() + "\r\n" + dbkey + "\r\n"); // Send each key in the correct RESP2 format
                                 }
                                 printWriter.flush();
                                 break;
