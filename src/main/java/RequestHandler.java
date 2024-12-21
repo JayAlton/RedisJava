@@ -107,25 +107,27 @@ public void run() {
                         }
                         break;
                     case "keys":
-                        bufferedReader.readLine(); // Reading the '*' token for KEYS command
+                        bufferedReader.readLine(); // Read the '*' symbol for the KEYS command
                         String db_op = bufferedReader.readLine();
                         switch (db_op) {
                             case "*":
-                                // Construct the list of keys from the 'store' HashMap
-                                // Assume 'store' contains the keys from the database
-                                printWriter.print("*" + store.size() + "\r\n"); // Send the number of keys in the array
-                    
-                                for (String dbkey : store.keySet()) {
-                                    printWriter.print("$" + dbkey.length() + "\r\n" + dbkey + "\r\n"); // Send each key in the correct RESP2 format
+                                // Send the number of keys in the store (array length)
+                                printWriter.print("*" + store.size() + "\r\n");
+                                
+                                // Iterate over the keys in the store and send each key in the RESP2 format
+                                for (String dbKey : store.keySet()) {
+                                    printWriter.print("$" + dbKey.length() + "\r\n" + dbKey + "\r\n");
                                 }
                                 printWriter.flush();
                                 break;
                             default:
+                                // Handle other operations or invalid commands
                                 printWriter.print("-ERR Unknown operation\r\n");
                                 printWriter.flush();
                                 break;
                         }
-                        break;                    
+                        break;
+                                     
                 }
             }
         }
