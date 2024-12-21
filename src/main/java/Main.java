@@ -20,11 +20,11 @@ public class Main {
     int port = 6379;
     // Parse arguments
     for (int i = 0; i < args.length; i++) {
-      if (args[i].equals("--dir") && i + 1 < args.length) {
-          dir = args[i + 1];
-      } else if (args[i].equals("--dbfilename") && i + 1 < args.length) {
-          fileName = args[i + 1];
-      }
+        if (args[i].equals("--dir") && i + 1 < args.length) {
+            dir = args[i + 1];
+        } else if (args[i].equals("--dbfilename") && i + 1 < args.length) {
+            fileName = args[i + 1];
+        }
     }
 
     if (dir == null || fileName == null) {
@@ -61,7 +61,8 @@ public class Main {
       // Since the tester restarts your program quite often, setting SO_REUSEADDR
       // ensures that we don't run into 'Address already in use' errors
       serverSocket.setReuseAddress(true);
-     // Wait for connections from clients.
+      inputStream = new FileInputStream(rdbFile);
+      // Wait for connections from clients.
       while (true) {
         Socket clientSocket = serverSocket.accept();
         new Thread(() -> handleClient(clientSocket)).start();
