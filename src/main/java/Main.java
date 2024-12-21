@@ -162,6 +162,7 @@ public class Main {
                     System.out.println("Invalid port number: " + args[i + 1]);
                 }
             } else {
+                port = 6379;
                 System.out.println("Port number missing after --port flag.");
             }
         }
