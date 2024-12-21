@@ -32,7 +32,7 @@ public class Main {
       // ensures that we don't run into 'Address already in use' errors
       serverSocket.setReuseAddress(true);
       File rdbFile = new File(dir + File.separator + fileName);
-      System.out.println("New File directory: " + dir + "/" + fileName);
+      System.out.println("Current working directory: " + System.getProperty("user.dir"));
       System.out.println("File exists: " + rdbFile.exists());
       System.out.println("Can read: " + rdbFile.canRead());
       System.out.println("Can write: " + rdbFile.canWrite());
