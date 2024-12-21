@@ -183,6 +183,8 @@ public class Main {
       ByteBuffer buffer = ByteBuffer.allocate(256);
       System.out.println("Server is running on port " + port);
       if (args.length > 0 && args.length < 3) {
+        dir = null;
+        dbfilename = null;
         loadPort(args);
         loadRDBFile();
       } else {
