@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 // Build Redis
 public class Main {
   private static int port;
+  private static String role;
   public static Map<String, String> data = new ConcurrentHashMap<>();
   public static Map<String, LocalDateTime> expiryTimes =
       new ConcurrentHashMap<>();
@@ -155,6 +156,13 @@ public class Main {
         if (args != null && args.length > 0) {
             if ((args[0].equalsIgnoreCase("--port") || args[0].equalsIgnoreCase("-p")) && args.length > 1) {
                 port = Integer.parseInt(args[1]);
+                if(args.length > 2) {
+                    if(args[2].equalsIgnoreCase("--replicaof")) {
+                        role = "slave";
+                    } else {
+                        role = "master";
+                    }
+                }
             } else {
                 // Default port if --port is not provided
                 port = 6379;
@@ -341,7 +349,7 @@ public class Main {
                 break;
               case "INFO": 
                 System.out.println("Recieved INFO command");
-                clientChannel.write(ByteBuffer.wrap(("$" + 11 + "\r\nrole:master\r\n").getBytes()));
+                clientChannel.write(ByteBuffer.wrap(("$" + (5 + role.length()) + "\r\nrole:" + role + "\r\n").getBytes()));
                 break;
               default:
                 break;
