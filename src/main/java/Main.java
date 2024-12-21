@@ -1,7 +1,8 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -12,7 +13,7 @@ public class Main {
    private static final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
    private static String dir =  null;
    private static String fileName = null;
-
+   private static InputStream inputStream = null;
   public static void main(String[] args){
     // You can use print statements as follows for debugging, they'll be visible when running tests.
     System.out.println("Logs from your program will appear here!");
@@ -24,6 +25,7 @@ public class Main {
     int port = 6379;
     
     try {
+      inputStream = new FileInputStream(fileName);
       serverSocket = new ServerSocket(port);
       // Since the tester restarts your program quite often, setting SO_REUSEADDR
       // ensures that we don't run into 'Address already in use' errors
@@ -135,10 +137,90 @@ public class Main {
                 writer.write(ans);
               }
               break;
+          case "KEYS":
+            String key = "foo";
+            byte[] redis = new byte[5];
+            byte[] version = new byte[4];
+            inputStream.read(redis);
+            inputStream.read(version);
+            System.out.println("Magic String = " + new String(redis, StandardCharsets.UTF_8));
+            System.out.println("Version = " + new String(version, StandardCharsets.UTF_8));
+            int b;
+            header:
+            while((b = inputStream.read()) != -1) {
+              switch(b) {
+                case 0xFF:
+                  System.out.println("EOF");
+                  break;
+                case 0xFE:
+                  System.out.println("SELECTDB");
+                  break;              
+                case 0xFD:
+                  System.out.println("EXPIRETIME");
+                  break;
+                case 0xFC:
+                  System.out.println("EXPIRETIMEMS");
+                  break;
+                case 0xFB:
+                  System.out.println("RESIZEDB");
+                  b = inputStream.read();
+                  inputStream.readNBytes(getLength(inputStream, b));
+                  inputStream.readNBytes(getLength(inputStream, b));
+                  break header;
+                case 0xFA:
+                  System.out.println("AUX");
+                  break;
+              }
+            }
+            System.out.println("header done");
+            // now key value pairs
+            while((b = inputStream.read()) != -1) {
+              System.out.println("value-type = " + b);
+              b = inputStream.read();
+              System.out.println("value-type = " + b);
+              System.out.println(" b = " + Integer.toBinaryString(b));
+              System.out.println("reading keys");
+              int strLength = getLength(inputStream, b);
+              b = inputStream.read();
+              System.out.println("strLength == " + strLength);
+              if (strLength == 0) {
+                strLength = b;
+              }
+              System.out.println("strLength == " + strLength);
+              byte[] bytes = inputStream.readNBytes(strLength);
+              key = new String(bytes);
+              break;
+            }
+            String outputString = new String("*1\r\n$" + key.length() + "\r\n" + key + "\r\n");
+            writer.write(outputString);
+            break;
           default:
               writer.write("-ERR Unknown command\r\n");
       }
       writer.flush();
-  }
+    }
+    
+    private static int getLength(InputStream is, int b) throws IOException {
+      int length = 100;
+      int first2bytes = b & 11000000;
+      if (first2bytes == 0) {
+        System.out.println("00");
+        length = 0;
+      } else if (first2bytes == 128) {
+        System.out.println("01");
+        length = 2;
+      } else if (first2bytes == 256) {
+        System.out.println("10");
+        ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES);
+        buffer.put(is.readNBytes(4));
+        buffer.rewind();
+        length = 1 + buffer.getInt();
+      } else if (first2bytes == 256 + 128) {
+        System.out.println("11");
+        length = 1; //special format
+      }
+
+      return length;
+    }
 }
 
