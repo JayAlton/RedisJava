@@ -153,19 +153,20 @@ public class Main {
 
   private static void loadPort(String[] args) {
     for(int i = 0; i < args.length; i++) {
-        if ("--port".equals(args[i])) {
+        if ("--port".equalsIgnoreCase(args[i])) {
             if (i + 1 <args.length) {
                 try {
                     port = Integer.parseInt(args[i+1]);
                     System.out.println("Using port: " + port);
+                    return;
                 } catch(NumberFormatException e) {
                     System.out.println("Invalid port number: " + args[i + 1]);
                 }
             } else {
-                port = 6379;
                 System.out.println("Port number missing after --port flag.");
             }
         }
+        port = 6379;
     }
 
     System.out.println("Port number missing after --port flag.");
