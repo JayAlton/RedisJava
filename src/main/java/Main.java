@@ -32,6 +32,10 @@ public class Main {
       // ensures that we don't run into 'Address already in use' errors
       serverSocket.setReuseAddress(true);
       File rdbFile = new File(dir + File.separator + fileName);
+      File dirFile = new File(dir);
+      String fullPath = dirFile.getAbsolutePath() + File.separator + fileName;
+      System.out.println("Full path with escaped characters: '" + fullPath + "'");
+
       System.out.println("Current working directory: " + System.getProperty("user.dir"));
       System.out.println("File exists: " + rdbFile.exists());
       System.out.println("Can read: " + rdbFile.canRead());
