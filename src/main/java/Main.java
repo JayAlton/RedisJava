@@ -59,8 +59,8 @@ public class Main{
           slaveSocket.getOutputStream().flush();
           String sendPSYNC = makeRESPArray(new String[]{"PSYNC", "?", "-1"});
           slaveSocket.getOutputStream().write(sendPSYNC.getBytes());
-          slaveSocket.getInputStream().read();
-          slaveSocket.getOutputStream().flush();
+          //slaveSocket.getInputStream().read();
+          //slaveSocket.getOutputStream().flush();
         }catch(Exception e) {
           System.out.println("error in connection to master port: "+ e.getMessage());
         }
@@ -136,11 +136,6 @@ public class Main{
           case "ping":
             response = makeBulkString("PONG", false);
             break;
-          case "replconf":
-            response = makeBulkString("OK", false);
-            break;
-          case "psync": 
-            response = makeBulkString("+FULLRESYNC" + master_replicationID + " " + master_replicationOffset, false);
           case "config":
             response = handleGet(tokens[2]);
             break;
@@ -158,7 +153,13 @@ public class Main{
             // response += makeBulkString("master_repl_offset:"+master_replicationOffset, false);
              break;
 
+          case "replconf":
+            response = makeBulkString("OK", false);
+            break;
 
+          case "psync": 
+            response = makeBulkString("+FULLRESYNC" + master_replicationID + " " + master_replicationOffset, false);
+            break;
 
           default:
             break;
