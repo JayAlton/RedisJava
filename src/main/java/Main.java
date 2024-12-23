@@ -140,7 +140,7 @@ public class Main{
             response = makeBulkString("OK", false);
             break;
           case "psync": 
-            response = makeBulkString("FULLRESYNC" + master_replicationID + master_replicationOffset, false);
+            response = makeBulkString("+FULLRESYNC" + master_replicationID + " " + master_replicationOffset, false);
           case "config":
             response = handleGet(tokens[2]);
             break;
