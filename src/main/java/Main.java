@@ -1,3 +1,4 @@
+import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -23,7 +24,6 @@ public class Main {
   private static String dir = null;
   private static String dbfilename = null;
   private static String master_replid = "8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb";
-  private static int master_repl_offset = 0;
   public static void loadRDBFile() throws FileNotFoundException, IOException {
     if (dir == null || dbfilename == null) {
       System.out.println("No RDB File specified.");
@@ -153,6 +153,17 @@ public class Main {
       return 0;
     }
   }
+  
+  private static void writeBulkString(DataOutputStream out, String arg) {
+    try {
+      out.writeBytes("$" + arg.length() + "\r\n");
+      out.writeBytes(arg + "\r\n");
+    } catch (IOException e) {
+      System.out.println("Failed to write bulk string to client " +
+                         e.getMessage());
+    }
+  }
+
   public static void main(String[] args) throws ClosedChannelException {
     try {
         if (args != null && args.length > 0) {
@@ -349,7 +360,11 @@ public class Main {
                 break;
               case "INFO": 
                 System.out.println("Recieved INFO command");
-                clientChannel.write(ByteBuffer.wrap(("$" + (5 + role.length()) + "\r\nrole:" + role + "\r\n" + "$" + (14 + master_replid.length()) + "\r\nmaster_replid:" + master_replid + "\r\n" + "$" + (20) + "\r\nmaster_repl_offset:" + master_repl_offset + "\r\n").getBytes()));
+                String roleStr = String.format("role:%s\r\n", role);
+                String masterReplidStr = String.format("master_replid:%s\r\n", master_replid);
+                String offset = String.format("master_repl_offset:%s\r\n", "0");
+                String builder = roleStr + masterReplidStr + offset;
+                clientChannel.write(ByteBuffer.wrap(("$" + builder.length() + "\r\n" + builder + "\r\n").getBytes()));
                 break;
               default:
                 break;
