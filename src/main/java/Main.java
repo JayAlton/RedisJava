@@ -119,6 +119,7 @@ public class Main {
     fileBuffer.get(StringBytes);
     return new String(StringBytes);
   }
+
   private static int readSize(ByteBuffer buffer) {
     byte firstByte = buffer.get();
     int firstTwoBits = (firstByte & 0xC0) >> 6;
@@ -153,17 +154,38 @@ public class Main {
       return 0;
     }
   }
-  
-  private static void writeBulkString(DataOutputStream out, String arg) {
-    try {
-      out.writeBytes("$" + arg.length() + "\r\n");
-      out.writeBytes(arg + "\r\n");
-    } catch (IOException e) {
-      System.out.println("Failed to write bulk string to client " +
-                         e.getMessage());
-    }
+
+  private static ByteBuffer pingResponse(ByteBuffer responseBuffer) {
+    responseBuffer = ByteBuffer.wrap("+PONG\r\n".getBytes());
+    return responseBuffer;
   }
 
+  private static ByteBuffer setResponse(ByteBuffer responseBuffer, String[] parts) {
+    System.out.println("Set Command key: " + parts[4] +
+                        "\r\nSet Command value: " + parts[6]);
+    if (parts.length == 7) {
+      if (!parts[4].isEmpty()) {
+        data.put(parts[4], parts[6]);
+      }
+      responseBuffer = ByteBuffer.wrap("+OK\r\n".getBytes());
+      expiryTimes.remove(
+          parts[4]); // remove any existing expiration for this key
+    } else if (parts.length == 11 &&
+                parts[8].equalsIgnoreCase("PX")) {
+      // Set command with PX to set expiration
+      if (!parts[4].isEmpty()) {
+        data.put(parts[4], parts[6]);
+      }
+      long expiryMillis = 1_000_000 * Long.parseLong(parts[10]);
+      LocalDateTime expiryTime =
+          LocalDateTime.now().plusNanos(expiryMillis);
+      expiryTimes.put(parts[4],
+                      expiryTime); // store the expiration time
+      responseBuffer = ByteBuffer.wrap("+OK\r\n".getBytes());
+    }
+
+    return responseBuffer;
+  }
   public static void main(String[] args) throws ClosedChannelException {
     try {
         if (args != null && args.length > 0) {
@@ -260,8 +282,7 @@ public class Main {
               ByteBuffer responseBuffer = null;
               switch (command) {
               case "PING":
-                responseBuffer = ByteBuffer.wrap("+PONG\r\n".getBytes());
-                clientChannel.write(responseBuffer);
+                clientChannel.write(pingResponse(responseBuffer));
                 break;
               case "ECHO":
                 System.out.println("Echo Argument: " + parts[4]);
@@ -272,29 +293,7 @@ public class Main {
                 break;
               case "SET":
                 // Set command without PX
-                System.out.println("Set Command key: " + parts[4] +
-                                   "\r\nSet Command value: " + parts[6]);
-                if (parts.length == 7) {
-                  if (!parts[4].isEmpty()) {
-                    data.put(parts[4], parts[6]);
-                  }
-                  responseBuffer = ByteBuffer.wrap("+OK\r\n".getBytes());
-                  expiryTimes.remove(
-                      parts[4]); // remove any existing expiration for this key
-                } else if (parts.length == 11 &&
-                           parts[8].equalsIgnoreCase("PX")) {
-                  // Set command with PX to set expiration
-                  if (!parts[4].isEmpty()) {
-                    data.put(parts[4], parts[6]);
-                  }
-                  long expiryMillis = 1_000_000 * Long.parseLong(parts[10]);
-                  LocalDateTime expiryTime =
-                      LocalDateTime.now().plusNanos(expiryMillis);
-                  expiryTimes.put(parts[4],
-                                  expiryTime); // store the expiration time
-                  responseBuffer = ByteBuffer.wrap("+OK\r\n".getBytes());
-                }
-                clientChannel.write(responseBuffer);
+                clientChannel.write(setResponse(responseBuffer, parts));
                 break;
               case "GET":
                 LocalDateTime expirationTime = expiryTimes.get(parts[4]);
