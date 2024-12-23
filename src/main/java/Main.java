@@ -57,6 +57,10 @@ public class Main{
           slaveSocket.getOutputStream().write(sendCAPA.getBytes());
           slaveSocket.getInputStream().read();
           slaveSocket.getOutputStream().flush();
+          String sendCAPA2 = makeRESPArray(new String[]{"REPLCONF", "capa", "psync2"});
+          slaveSocket.getOutputStream().write(sendCAPA2.getBytes());
+          slaveSocket.getInputStream().read();
+          slaveSocket.getOutputStream().flush();
           String sendPSYNC = makeRESPArray(new String[]{"PSYNC", "?", "-1"});
           slaveSocket.getOutputStream().write(sendCAPA.getBytes());
           slaveSocket.getInputStream().read();
