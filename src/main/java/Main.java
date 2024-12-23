@@ -49,18 +49,22 @@ public class Main{
           slaveSocket.getOutputStream().write(pingMaster.getBytes());
           slaveSocket.getInputStream().read();
           slaveSocket.getOutputStream().flush();
-          String sendRRPLCONF = makeRESPArray(new String[]{"REPLCONF", "listening-port", ""+port});
+
+          String sendRRPLCONF = makeRESPArray(new String[]{"REPLCONF" , "listening-port", ""+port});
           slaveSocket.getOutputStream().write(sendRRPLCONF.getBytes());
           slaveSocket.getInputStream().read();
           slaveSocket.getOutputStream().flush();
-          String sendCAPA = makeRESPArray(new String[]{"REPLCONF", "capa", "psync2"});
+
+          String sendCAPA = makeRESPArray(new String[]{"REPLCONF" ,"capa" , "psync2" });
           slaveSocket.getOutputStream().write(sendCAPA.getBytes());
           slaveSocket.getInputStream().read();
           slaveSocket.getOutputStream().flush();
-          String sendPSYNC = makeRESPArray(new String[]{"PSYNC", "?", "-1"});
+
+          String sendPSYNC = makeRESPArray(new String[]{"PSYNC" ,"?", "-1"});
           slaveSocket.getOutputStream().write(sendPSYNC.getBytes());
-          //slaveSocket.getInputStream().read();
-          //slaveSocket.getOutputStream().flush();
+          // slaveSocket.getInputStream().read();
+          // slaveSocket.getOutputStream().flush();
+
         }catch(Exception e) {
           System.out.println("error in connection to master port: "+ e.getMessage());
         }
@@ -136,6 +140,7 @@ public class Main{
           case "ping":
             response = makeBulkString("PONG", false);
             break;
+          
           case "config":
             response = handleGet(tokens[2]);
             break;
@@ -154,12 +159,12 @@ public class Main{
              break;
 
           case "replconf":
-            response = makeBulkString("OK", false);
-            break;
+              response = "+OK\r\n";
+              break;  
 
-          case "psync": 
-            response = makeBulkString("+FULLRESYNC" + master_replicationID + " " + master_replicationOffset, false);
-            break;
+          case "psync":
+                response = makeBulkString("+FULLRESYNC "+master_replicationID+" "+master_replicationOffset+"\r\n", false);
+                break;
 
           default:
             break;
