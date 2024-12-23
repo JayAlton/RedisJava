@@ -140,8 +140,9 @@ public class Main{
               // response += makeBulkString("master_replid:"+master_replicationID+"master_repl_offset:"+master_replicationOffset, false);
             // response += makeBulkString("master_repl_offset:"+master_replicationOffset, false);
              break;
-
-
+          case "replconf":
+              response = makeBulkString("+OK", false);
+              break;
 
           default:
             break;
