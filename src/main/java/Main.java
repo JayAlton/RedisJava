@@ -349,9 +349,7 @@ public class Main {
                 break;
               case "INFO": 
                 System.out.println("Recieved INFO command");
-                clientChannel.write(ByteBuffer.wrap(("$" + (5 + role.length()) + "\r\nrole:" + role + "\r\n" + 
-                                                     "$" + (14 + master_replid.length()) + "\r\nmaster_replid:" + master_replid + "\r\n" +
-                                                     "$" + (20) + "\r\nmaster_repl_offset:" + master_repl_offset + "\r\n").getBytes()));
+                clientChannel.write(ByteBuffer.wrap(("$" + (5 + role.length()) + "\r\nrole:" + role + "\r\n" + "$" + (14 + master_replid.length()) + "\r\nmaster_replid:" + master_replid + "\r\n" + "$" + (20) + "\r\nmaster_repl_offset:" + master_repl_offset + "\r\n").getBytes()));
                 break;
               default:
                 break;
