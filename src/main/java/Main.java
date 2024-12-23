@@ -136,7 +136,9 @@ public class Main{
           case "ping":
             response = makeBulkString("PONG", false);
             break;
-          
+          case "replconf":
+            response = makeBulkString("OK", false);
+            break;
           case "config":
             response = handleGet(tokens[2]);
             break;
