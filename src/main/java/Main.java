@@ -22,6 +22,8 @@ public class Main {
       new ConcurrentHashMap<>();
   private static String dir = null;
   private static String dbfilename = null;
+  private static String master_replid = "8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb";
+  private static int master_repl_offset = 0;
   public static void loadRDBFile() throws FileNotFoundException, IOException {
     if (dir == null || dbfilename == null) {
       System.out.println("No RDB File specified.");
@@ -347,7 +349,9 @@ public class Main {
                 break;
               case "INFO": 
                 System.out.println("Recieved INFO command");
-                clientChannel.write(ByteBuffer.wrap(("$" + (5 + role.length()) + "\r\nrole:" + role + "\r\n").getBytes()));
+                clientChannel.write(ByteBuffer.wrap(("$" + (5 + role.length()) + "\r\nrole:" + role + "\r\n" + 
+                                                     "$" + (14 + master_replid.length()) + "\r\nmaster_replid:" + master_replid + "\r\n" +
+                                                     "$" + (20) + "\r\nmaster_repl_offset:" + master_repl_offset + "\r\n").getBytes()));
                 break;
               default:
                 break;
