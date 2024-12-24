@@ -151,10 +151,9 @@ public class Main{
             }
             response = "+OK\r\n";
 
-            queue.add(tokens);
             System.out.println("Replica output stream size: " + Main.replicaOutputStreams.size());
-            if (Main.replicaOutputStreams.size() > 0) {
-                Main.replicaOutputStreams.get(0).write(makeRESPArray(tokens).getBytes());
+            for (int i = 0; i < Main.replicaOutputStreams.size(); i++) {
+                Main.replicaOutputStreams.get(i).write(makeRESPArray(tokens).getBytes());
             }
 
             break;
@@ -195,7 +194,7 @@ public class Main{
                 clientSocket.getOutputStream().write(response.getBytes());
                 clientSocket.getOutputStream().write(bytes);
                 response = null;
-                RespondTask task = new RespondTask(clientSocket.getOutputStream());
+                Main.replicaOutputStreams.add(clientSocket.getOutputStream());
                 break;
 
           default:
