@@ -8,12 +8,14 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ConcurrentHashMap;
 import java.io.File;
 import java.io.FileReader;
 
 public class Main{
-  
+  static List<OutputStream> replicaOutputStreams = new ArrayList<>();
   static ConcurrentHashMap<String,ValueAndExpiry> map = new ConcurrentHashMap<>();
   static String directoryPath = null;
   static String dbFileName = null;
@@ -23,12 +25,16 @@ public class Main{
   static String master_replicationOffset = "0";
   static String masterIP = "";
   static String hostName = "";
+  static int slavePort = -1;
+  static String slaveName = "localhost";
+  static int port = 6379;
+  static OutputStream slaveOutput;
+  static Queue<String[]> queue = new LinkedList<>();
 
   public static void main(String[] args){
     // You can use print statements as follows for debugging, they'll be visible when running tests.
     System.out.println("Logs from your program will appear here!");
     
-    int port = 6379;
     for(int i = 0 ; i < args.length ; i++){
       if(args[i].equals("--replicaof")) {
         role = "slave";
@@ -45,6 +51,7 @@ public class Main{
 
         try{
           Socket slaveSocket = new Socket(hostName , masterPort);
+          slaveOutput = slaveSocket.getOutputStream();
           String pingMaster = "*1\r\n$4\r\nPING\r\n";
           slaveSocket.getOutputStream().write(pingMaster.getBytes());
           slaveSocket.getInputStream().read();
@@ -108,7 +115,18 @@ public class Main{
        }
        
   }
+
+  final static class RespondTask {
+    final OutputStream out;
+    public RespondTask(OutputStream out) {
+        this.out = out;
+        Main.replicaOutputStreams.add(out);
+    }
+  }
+  
   static void handleClient(Socket clientSocket) {
+    BlockingQueue<String[]> blockingQueue = new LinkedBlockingDeque<>();
+
     try{
 
       Parser parser = new Parser(clientSocket.getInputStream());
@@ -132,6 +150,13 @@ public class Main{
               map.put(tokens[1] , new ValueAndExpiry(tokens[2], Long.MAX_VALUE));
             }
             response = "+OK\r\n";
+
+            queue.add(tokens);
+            System.out.println("Replica output stream size: " + Main.replicaOutputStreams.size());
+            if (Main.replicaOutputStreams.size() > 0) {
+                Main.replicaOutputStreams.get(0).write(makeRESPArray(tokens).getBytes());
+            }
+
             break;
           case "get":
             response = handleGet(tokens[1]);
@@ -170,6 +195,7 @@ public class Main{
                 clientSocket.getOutputStream().write(response.getBytes());
                 clientSocket.getOutputStream().write(bytes);
                 response = null;
+                RespondTask task = new RespondTask(clientSocket.getOutputStream());
                 break;
 
           default:
